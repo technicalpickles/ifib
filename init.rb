@@ -16,27 +16,16 @@ get %r{/api/v1/fibonacci/([\d]+)} do
 end 
 
 def fib(n)
-  fib_n = CACHE.get(n)
-  unless fib_n
+  CACHE.get(n) || begin
     return n if (0..1).include? n
 
-    n_1 = CACHE.get(n - 1)
-    unless n_1
-      n_1 = fib(n - 1)
-      CACHE.set(n - 1, n_1)
-    end
+    n_1 = CACHE.get(n - 1) || fib(n - 1)
+    n_2 = CACHE.get(n - 2) || fib(n - 2)
 
-    n_2 = CACHE.get(n - 2)
-    unless n_2 
-      n_2 = fib(n - 2)
-      CACHE.set(n - 2, n_2)
-    end
-
-    fib_n = n_1 + n_2
-    CACHE.set(n, fib_n)
+    result = n_1 + n_2
+    CACHE.add(n, result)
+    result
   end
-
-  fib_n
 end
 
 __END__
